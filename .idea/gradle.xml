@@ -17,6 +17,8 @@
             <option value="$PROJECT_DIR$/data/firebaseauth" />
             <option value="$PROJECT_DIR$/data/firebasefirestore" />
             <option value="$PROJECT_DIR$/data/firebasestorage" />
+            <option value="$PROJECT_DIR$/domain" />
+            <option value="$PROJECT_DIR$/domain/books" />
             <option value="$PROJECT_DIR$/feature" />
             <option value="$PROJECT_DIR$/feature/auth" />
           </set>
