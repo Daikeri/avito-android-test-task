@@ -21,6 +21,7 @@
             <option value="$PROJECT_DIR$/domain/books" />
             <option value="$PROJECT_DIR$/feature" />
             <option value="$PROJECT_DIR$/feature/auth" />
+            <option value="$PROJECT_DIR$/feature/uploadbooks" />
           </set>
         </option>
         <option name="resolveExternalAnnotations" value="false" />
