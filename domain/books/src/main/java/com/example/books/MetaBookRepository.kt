@@ -13,7 +13,8 @@ interface MetaBookRepository {
 }
 
 sealed class MetaBookError {
-    data object SaveFailed : MetaBookError()
     data object NetworkError : MetaBookError()
+    data object PermissionDenied : MetaBookError()
+    data object SaveFailed : MetaBookError()
     data class Unknown(val message: String?) : MetaBookError()
 }
