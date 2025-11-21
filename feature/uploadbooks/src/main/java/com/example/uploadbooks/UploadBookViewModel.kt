@@ -1,11 +1,11 @@
 package com.example.uploadbooks
 
-
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.auth.AuthStatusRepository
+import com.example.auth.AuthRepository
 import com.example.books.UploadBookUseCase
+import com.example.books.UploadDomainError
 import com.example.util.ResultState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -16,10 +16,18 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+data class UploadUiState(
+    val isLoading: Boolean = false,
+    val progress: Float = 0f,
+    val isSuccess: Boolean = false,
+    val error: UploadDomainError? = null
+)
+
 @HiltViewModel
 class UploadBookViewModel @Inject constructor(
     private val uploadBookUseCase: UploadBookUseCase,
-    private val authStatusRepository: AuthStatusRepository
+    // Обновлен интерфейс репозитория
+    private val authRepository: AuthRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(UploadUiState())
@@ -29,24 +37,22 @@ class UploadBookViewModel @Inject constructor(
 
     fun uploadBook(title: String, author: String, fileUri: Uri?) {
         if (title.isBlank() || author.isBlank() || fileUri == null) {
-            _uiState.update { it.copy(errorMessage = "Заполните все поля") }
+            _uiState.update { it.copy(error = UploadDomainError.Unknown("Заполните все поля")) }
             return
         }
 
-        val userId = authStatusRepository.getCurrentUserId()
+        val userId = authRepository.getCurrentUserId()
         if (userId == null) {
-            _uiState.update { it.copy(errorMessage = "Ошибка: пользователь не авторизован") }
+            _uiState.update { it.copy(error = UploadDomainError.NotAuthorized) }
             return
         }
 
         uploadJob?.cancel()
         uploadJob = viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, progress = 0f, errorMessage = null, isSuccess = false) }
+            _uiState.update { it.copy(isLoading = true, progress = 0f, error = null, isSuccess = false) }
 
-            // Запускаем фейковый прогресс-бар для UI
             val progressJob = launch { simulateProgress() }
 
-            // Вызываем UseCase, который координирует работу Storage и Firestore
             val result = uploadBookUseCase(
                 userId = userId,
                 title = title,
@@ -60,8 +66,15 @@ class UploadBookViewModel @Inject constructor(
                 is ResultState.Success -> {
                     _uiState.update { it.copy(isLoading = false, progress = 1f, isSuccess = true) }
                 }
+
                 is ResultState.Error -> {
-                    _uiState.update { it.copy(isLoading = false, progress = 0f, errorMessage = result.exceptionMsg) }
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            progress = 0f,
+                            error = result.error
+                        )
+                    }
                 }
             }
         }
@@ -72,7 +85,17 @@ class UploadBookViewModel @Inject constructor(
     }
 
     fun clearError() {
-        _uiState.update { it.copy(errorMessage = null) }
+        _uiState.update { it.copy(error = null) }
+    }
+
+    fun getErrorMessage(error: UploadDomainError): String {
+        return when (error) {
+            UploadDomainError.FileUploadFailed -> "Ошибка загрузки файла. Возможно, проблема с хранилищем."
+            UploadDomainError.MetadataSaveFailed -> "Ошибка сохранения метаданных книги."
+            UploadDomainError.Network -> "Отсутствует подключение к сети. Проверьте соединение."
+            UploadDomainError.NotAuthorized -> "Пользователь не авторизован. Пожалуйста, войдите в аккаунт."
+            is UploadDomainError.Unknown -> error.message ?: "Произошла неизвестная ошибка."
+        }
     }
 
     private suspend fun simulateProgress() {
@@ -84,11 +107,3 @@ class UploadBookViewModel @Inject constructor(
         }
     }
 }
-
-
-data class UploadUiState(
-    val isLoading: Boolean = false,
-    val progress: Float = 0f,
-    val isSuccess: Boolean = false,
-    val errorMessage: String? = null
-)

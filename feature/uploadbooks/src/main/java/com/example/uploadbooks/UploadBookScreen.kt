@@ -1,6 +1,5 @@
 package com.example.uploadbooks
 
-
 import android.net.Uri
 import android.util.Log
 import android.widget.Toast
@@ -51,10 +50,14 @@ fun UploadBookScreen(
         }
     }
 
-    LaunchedEffect(state.errorMessage) {
-        state.errorMessage?.let {
-            Log.e("ERROR", it)
-            Toast.makeText(context, it, Toast.LENGTH_LONG).show()
+    LaunchedEffect(state.error) {
+        state.error?.let { error ->
+            val errorMessage = viewModel.getErrorMessage(error)
+
+            Log.e("UPLOAD_ERROR", errorMessage)
+            Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
+
+            viewModel.clearError() // Очищаем ошибку после показа
         }
     }
 
