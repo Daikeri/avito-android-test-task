@@ -20,14 +20,20 @@ fun LoginScreen(
     val uiState by viewModel.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
 
-    // Обработка навигации и ошибок
+
     LaunchedEffect(uiState.loginStatus) {
         when (val status = uiState.loginStatus) {
             LoginStatus.Success -> onLoginSuccess()
             is LoginStatus.Error -> {
+
+                val errorMessage = viewModel.getErrorMessage(status.error)
+
+
+                val actionLabel = if (status.error is LoginDomainError.Network) "Повторить" else null
+
                 snackbarHostState.showSnackbar(
-                    message = status.message,
-                    actionLabel = if (status.message.contains("сети")) "Повторить" else null,
+                    message = errorMessage,
+                    actionLabel = actionLabel,
                     duration = SnackbarDuration.Short
                 )
                 viewModel.resetErrorStatus()
@@ -76,10 +82,9 @@ private fun LoginFormContent(
     onPasswordChange: (String) -> Unit,
     onLoginClick: () -> Unit
 ) {
-    val isFormEnabled = uiState.loginStatus is LoginStatus.Idle
+    val isFormEnabled = uiState.loginStatus is LoginStatus.Idle || uiState.loginStatus is LoginStatus.Error
     val isLoading = uiState.loginStatus is LoginStatus.Loading
 
-    // Зарезервированная высота для текста ошибки (примерно 1 строка)
     val errorTextHeight = 20.dp
 
     Column(
@@ -93,7 +98,7 @@ private fun LoginFormContent(
             label = { Text("Email") },
             isError = uiState.emailError != null,
             supportingText = {
-                // Резервируем место для сообщения об ошибке
+
                 Text(
                     text = uiState.emailError ?: "",
                     modifier = Modifier.height(errorTextHeight)
@@ -103,14 +108,12 @@ private fun LoginFormContent(
             modifier = Modifier.fillMaxWidth()
         )
 
-        // --- Поле ввода Пароля ---
         OutlinedTextField(
             value = uiState.passwordInput,
             onValueChange = onPasswordChange,
             label = { Text("Пароль") },
             isError = uiState.passwordError != null,
             supportingText = {
-                // Резервируем место для сообщения об ошибке
                 Text(
                     text = uiState.passwordError ?: "",
                     modifier = Modifier.height(errorTextHeight)
@@ -120,10 +123,9 @@ private fun LoginFormContent(
             enabled = isFormEnabled,
             modifier = Modifier.fillMaxWidth()
         )
-        // Расстояние перед кнопкой
+
         Spacer(modifier = Modifier.height(32.dp))
 
-        // --- Кнопка Входа ---
         Button(
             onClick = onLoginClick,
             enabled = isFormEnabled,

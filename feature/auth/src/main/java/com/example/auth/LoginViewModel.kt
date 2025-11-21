@@ -3,6 +3,7 @@ package com.example.auth
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.util.ResultState
+import com.example.auth.AuthError
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -10,11 +11,17 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
+sealed class LoginDomainError {
+    data object Network : LoginDomainError()
+    data object InvalidCredentials : LoginDomainError()
+    data class Unknown(val rawError: AuthError) : LoginDomainError()
+}
+
 sealed class LoginStatus {
     data object Idle : LoginStatus()
     data object Loading : LoginStatus()
+    data class Error(val error: LoginDomainError) : LoginStatus()
     data object Success : LoginStatus()
-    data class Error(val message: String) : LoginStatus()
 }
 
 data class LoginUiState(
@@ -26,8 +33,9 @@ data class LoginUiState(
 )
 
 @HiltViewModel
+
 class LoginViewModel @Inject constructor(
-    private val authRepository: AuthStatusRepository
+    private val authRepository: AuthRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(LoginUiState())
@@ -67,14 +75,35 @@ class LoginViewModel @Inject constructor(
         _uiState.update { it.copy(loginStatus = LoginStatus.Loading) }
 
         viewModelScope.launch {
+            // Используем новый ResultState<T, E>
             when (val result = authRepository.login(email, password)) {
                 is ResultState.Success -> {
-                    // Успех (переход в состояние Success)
                     _uiState.update { it.copy(loginStatus = LoginStatus.Success) }
                 }
                 is ResultState.Error -> {
-                    // Ошибка (переход в состояние Error)
-                    _uiState.update { it.copy(loginStatus = LoginStatus.Error(result.exceptionMsg)) }
+                    val domainError = when (result.error) {
+                        is AuthError.Network -> LoginDomainError.Network
+                        is AuthError.InvalidCredentials -> LoginDomainError.InvalidCredentials
+                        else -> LoginDomainError.Unknown(result.error)
+                    }
+
+
+                    _uiState.update { it.copy(loginStatus = LoginStatus.Error(domainError)) }
+                }
+            }
+        }
+    }
+
+    fun getErrorMessage(error: LoginDomainError): String {
+        return when (error) {
+            LoginDomainError.Network -> "Отсутствует подключение к сети. Проверьте соединение."
+            LoginDomainError.InvalidCredentials -> "Неверный Email или пароль."
+            is LoginDomainError.Unknown -> {
+                val rawAuthError = error.rawError
+                if (rawAuthError is AuthError.Unknown) {
+                    rawAuthError.message ?: "Произошла неизвестная ошибка."
+                } else {
+                    "Ошибка авторизации: ${rawAuthError::class.simpleName}"
                 }
             }
         }
