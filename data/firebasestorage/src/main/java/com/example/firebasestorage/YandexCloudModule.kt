@@ -1,21 +1,17 @@
 package com.example.firebasestorage
 
-import com.example.books.FileStorageRepository
+import com.example.books.RawBookRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import javax.inject.Qualifier
 import javax.inject.Singleton
 
-@Qualifier
-@Retention(AnnotationRetention.BINARY)
-annotation class Yandex
 
 @Module
 @InstallIn(SingletonComponent::class)
-interface StorageModule {
+interface YandexCloudModule {
     @Binds
     @Singleton
-    fun bindYandex(impl:YandexFileStorageRepository) : FileStorageRepository
+    fun bindYandex(impl: YandexRawBookRepository) : RawBookRepository
 }

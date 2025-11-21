@@ -4,31 +4,53 @@ import android.net.Uri
 import com.example.util.ResultState
 import javax.inject.Inject
 
+sealed class UploadDomainError {
+    data object FileUploadFailed : UploadDomainError()
+    data object MetadataSaveFailed : UploadDomainError()
+    data object NotAuthorized : UploadDomainError()
+    data object Network : UploadDomainError()
+    data class Unknown(val message: String?) : UploadDomainError()
+}
+
 
 class UploadBookUseCase @Inject constructor(
-    private val fileStorageRepository: FileStorageRepository,
-    private val bookMetaRepository: BookMetaRepository
+    private val rawBookRepository: RawBookRepository,
+    private val metaBookRepository: MetaBookRepository
 ) {
     suspend operator fun invoke(
         userId: String,
         title: String,
         author: String,
         fileUri: Uri
-    ): ResultState<String> {
-        return try {
+    ): ResultState<String, UploadDomainError> {
 
-            val downloadUrl = fileStorageRepository.uploadFile(fileUri)
+        val uploadResult = rawBookRepository.uploadFile(fileUri)
 
-//            bookMetaRepository.saveBookMeta(
-//                userId = userId,
-//                title = title,
-//                author = author,
-//                fileUrl = downloadUrl
-//            )
+        val downloadUrl = when (uploadResult) {
+            is ResultState.Success -> uploadResult.data
+            is ResultState.Error -> return ResultState.Error(
+                when (uploadResult.error) {
+                    is RawBookError.NetworkError -> UploadDomainError.Network
+                    else -> UploadDomainError.FileUploadFailed
+                }
+            )
+        }
 
-            ResultState.Success("Книга успешно сохранена")
-        } catch (e: Exception) {
-            ResultState.Error(e.message ?: "Неизвестная ошибка")
+        val metaResult = metaBookRepository.uploadMeta(
+            userId = userId,
+            title = title,
+            author = author,
+            fileUrl = downloadUrl
+        )
+
+        return when (metaResult) {
+            is ResultState.Success -> ResultState.Success("Книга успешно сохранена")
+            is ResultState.Error -> ResultState.Error(
+                when (metaResult.error) {
+                    is MetaBookError.NetworkError -> UploadDomainError.Network
+                    else -> UploadDomainError.MetadataSaveFailed
+                }
+            )
         }
     }
 }

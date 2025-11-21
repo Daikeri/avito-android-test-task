@@ -1,6 +1,7 @@
 package com.example.firebasefirestore
 
-import com.example.books.BookMetaRepository
+
+import com.example.books.MetaBookRepository
 import com.google.firebase.firestore.FirebaseFirestore
 import dagger.Binds
 import dagger.Module
@@ -11,16 +12,16 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class FirestoreDataModule {
-    @Binds
+object FirestoreModuleProvide {
+    @Provides
     @Singleton
-    abstract fun bindBookMetaRepository(impl: FirestoreBookRepository): BookMetaRepository
+    fun provideFirestore(): FirebaseFirestore = FirebaseFirestore.getInstance()
 }
 
 @Module
 @InstallIn(SingletonComponent::class)
-object FirebaseProvidersModule {
-    @Provides
+abstract class FirestoreModuleBind {
+    @Binds
     @Singleton
-    fun provideFirestore(): FirebaseFirestore = FirebaseFirestore.getInstance()
+    abstract fun bindMetaBookRepository(impl: FirestoreMetaBookRepository): MetaBookRepository
 }
