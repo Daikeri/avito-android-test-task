@@ -14,10 +14,16 @@ android {
     compileSdk = 35
 
     defaultConfig {
-        minSdk = 24
+        minSdk = 26
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
+
+        val accessKey: String = providers.gradleProperty("YC_ACCESS_KEY_ID").get()
+        val secretKey: String = providers.gradleProperty("YC_SECRET_KEY").get()
+
+        buildConfigField("String", "YC_ACCESS_KEY_ID", "\"$accessKey\"")
+        buildConfigField("String", "YC_SECRET_KEY", "\"$secretKey\"")
     }
 
     buildTypes {
@@ -35,6 +41,9 @@ android {
     }
     kotlinOptions {
         jvmTarget = "11"
+    }
+    buildFeatures {
+        buildConfig = true
     }
 }
 
@@ -57,4 +66,10 @@ dependencies {
     implementation("com.google.firebase:firebase-storage-ktx")
 
     implementation(project(":core:util"))
+    implementation(project(":domain:books"))
+
+    implementation("aws.sdk.kotlin:s3:1.3.6")
+
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.8.0")
 }
