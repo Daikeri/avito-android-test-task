@@ -16,6 +16,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.auth.LoginScreen
 import com.example.avitotask.ui.AvitoTaskTheme
+import com.example.uploadbooks.UploadBookScreen
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -26,6 +27,7 @@ sealed class MainNavGraphDest {
     @Serializable
     data object WithBottomBar : MainNavGraphDest()
 }
+
 
 @Composable
 fun MainNavHost(
@@ -65,7 +67,9 @@ fun MainNavHost(
                         )
                     }
 
-                    composable<MainNavGraphDest.WithBottomBar> {}
+                    composable<MainNavGraphDest.WithBottomBar> {
+                        UploadBookScreen({})
+                    }
                 }
             }
         }
