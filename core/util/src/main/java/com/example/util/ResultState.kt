@@ -1,7 +1,7 @@
 package com.example.util
 
-// универсальный state
-sealed class ResultState<out T> {
-    data class Success<out T>(val data: T) : ResultState<T>()
-    data class Error(val exceptionMsg: String) : ResultState<Nothing>()
+
+sealed class ResultState<out T, out E> {
+    data class Success<out T>(val data: T) : ResultState<T, Nothing>()
+    data class Error<out E>(val error: E) : ResultState<Nothing, E>()
 }
