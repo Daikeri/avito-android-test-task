@@ -1,0 +1,113 @@
+package com.example.uploadbooks
+
+
+import android.net.Uri
+import android.util.Log
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.UploadFile
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun UploadBookScreen(
+    onNavigateBack: () -> Unit,
+    viewModel: UploadBookViewModel = hiltViewModel()
+) {
+    val state by viewModel.uiState.collectAsState()
+    val context = LocalContext.current
+
+    var selectedFileName by remember { mutableStateOf<String?>(null) }
+    var selectedFileUri by remember { mutableStateOf<Uri?>(null) }
+    var title by remember { mutableStateOf("") }
+    var author by remember { mutableStateOf("") }
+
+    val filePickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocument(),
+        onResult = { uri ->
+            uri?.let {
+                selectedFileUri = it
+                selectedFileName = it.path?.substringAfterLast("/") ?: "Файл выбран"
+            }
+        }
+    )
+
+    LaunchedEffect(state.isSuccess) {
+        if (state.isSuccess) {
+            Toast.makeText(context, "Книга загружена!", Toast.LENGTH_SHORT).show()
+            title = ""
+            author = ""
+            selectedFileUri = null
+            selectedFileName = null
+            viewModel.resetState()
+        }
+    }
+
+    LaunchedEffect(state.errorMessage) {
+        state.errorMessage?.let {
+            Log.e("ERROR", it)
+            Toast.makeText(context, it, Toast.LENGTH_LONG).show()
+        }
+    }
+
+    Scaffold(
+        topBar = { TopAppBar(title = { Text("Загрузка книги") }) }
+    ) { padding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            OutlinedButton(
+                onClick = { filePickerLauncher.launch(arrayOf("application/pdf", "application/epub+zip", "text/plain")) },
+                modifier = Modifier.fillMaxWidth(),
+                enabled = !state.isLoading
+            ) {
+                Icon(Icons.Default.UploadFile, contentDescription = null)
+                Spacer(Modifier.width(8.dp))
+                Text(selectedFileName ?: "Выбрать файл")
+            }
+
+            OutlinedTextField(
+                value = title,
+                onValueChange = { title = it },
+                label = { Text("Название") },
+                modifier = Modifier.fillMaxWidth(),
+                enabled = !state.isLoading
+            )
+
+            OutlinedTextField(
+                value = author,
+                onValueChange = { author = it },
+                label = { Text("Автор") },
+                modifier = Modifier.fillMaxWidth(),
+                enabled = !state.isLoading
+            )
+
+            if (state.isLoading) {
+                LinearProgressIndicator(
+                    progress = { state.progress },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            } else {
+                Button(
+                    onClick = { viewModel.uploadBook(title, author, selectedFileUri) },
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = title.isNotBlank() && author.isNotBlank() && selectedFileUri != null
+                ) {
+                    Text("Загрузить")
+                }
+            }
+        }
+    }
+}
