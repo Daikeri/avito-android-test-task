@@ -1,6 +1,6 @@
 package com.example.firebaseauth
 
-import com.example.auth.AuthStatusRepository
+import com.example.auth.AuthRepository
 import com.google.firebase.auth.FirebaseAuth
 import dagger.Binds
 import dagger.Module
@@ -12,7 +12,7 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object FirebaseAuthModule {
+object FirebaseAuthModuleProvide {
     @Provides
     @Singleton
     fun provideFirebaseAuth(): FirebaseAuth = FirebaseAuth.getInstance()
@@ -20,8 +20,8 @@ object FirebaseAuthModule {
 
 @Module
 @InstallIn(SingletonComponent::class)
-interface AuthModule {
+interface FirebaseAuthModuleBind {
     @Binds
     @Singleton
-    fun bindAuthStatusRepository(impl: AuthRepositoryImpl): AuthStatusRepository
+    fun bindAuthRepository(impl: FirebaseAuthRepository): AuthRepository
 }
