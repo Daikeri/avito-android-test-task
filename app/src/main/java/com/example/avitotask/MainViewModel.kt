@@ -2,7 +2,7 @@ package com.example.avitotask
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.firebaseauth.AuthRepositoryImpl
+import com.example.auth.AuthStatusRepository
 import com.example.util.ResultState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
@@ -18,17 +18,17 @@ sealed class MainUiState {
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    authRepository: AuthRepositoryImpl
+    private val authRepository: AuthStatusRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<MainUiState>(MainUiState.Loading)
     val uiState: StateFlow<MainUiState> = _uiState
 
     init {
-        checkAuthStatus(authRepository)
+        checkAuthStatus()
     }
 
-    private fun checkAuthStatus(authRepository: AuthRepositoryImpl) {
+    private fun checkAuthStatus() {
        viewModelScope.launch {
            val result = authRepository.getCurrentUserStatus()
 
