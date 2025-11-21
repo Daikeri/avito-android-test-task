@@ -8,7 +8,10 @@
         id("com.google.devtools.ksp")
         // hilt + dagger
         id("com.google.dagger.hilt.android")
+        // firebase
         id("com.google.gms.google-services")
+        // хранение ключей
+        id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
     }
 
     android {
@@ -17,7 +20,7 @@
 
         defaultConfig {
             applicationId = "com.example.avitotask"
-            minSdk = 24
+            minSdk = 26
             targetSdk = 35
             versionCode = 1
             versionName = "1.0"
@@ -42,6 +45,7 @@
             jvmTarget = "11"
         }
         buildFeatures {
+            buildConfig = true
             compose = true
         }
     }
@@ -71,9 +75,9 @@
 
         implementation(project(":feature:auth"))
         implementation(project(":core:util"))
+        implementation(project(":domain:auth"))
         implementation(project(":data:firebaseauth"))
+        implementation(project(":feature:uploadbooks"))
 
-        // Jetpack Compose integration
-        val nav_version = "2.9.6"
-        implementation("androidx.navigation:navigation-compose:$nav_version")
+        implementation("androidx.navigation:navigation-compose:2.9.6")
     }
