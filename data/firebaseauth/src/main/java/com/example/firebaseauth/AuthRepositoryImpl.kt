@@ -1,5 +1,6 @@
 package com.example.firebaseauth
 
+import com.example.auth.AuthStatusRepository
 import com.example.util.ResultState
 import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.auth.FirebaseAuth
@@ -11,8 +12,8 @@ import javax.inject.Inject
 
 class AuthRepositoryImpl @Inject constructor(
     private val firebaseAuth: FirebaseAuth
-){
-    suspend fun register(email: String, password: String): ResultState<Unit> {
+): AuthStatusRepository {
+    override suspend fun register(email: String, password: String): ResultState<Unit> {
         return try {
             firebaseAuth.createUserWithEmailAndPassword(email, password).await()
             ResultState.Success(Unit)
@@ -27,7 +28,7 @@ class AuthRepositoryImpl @Inject constructor(
         }
     }
 
-    suspend fun login(email: String, password: String): ResultState<Unit> {
+    override suspend fun login(email: String, password: String): ResultState<Unit> {
         return try {
             firebaseAuth.signInWithEmailAndPassword(email, password).await()
             ResultState.Success(Unit)
@@ -40,13 +41,17 @@ class AuthRepositoryImpl @Inject constructor(
         }
     }
 
-    fun getCurrentUserStatus(): ResultState<Boolean> {
+    override fun getCurrentUserStatus(): ResultState<Boolean> {
         return try {
             val user = firebaseAuth.currentUser
             ResultState.Success(user != null)
         } catch (e: Exception) {
             ResultState.Error(AuthError.Unknown(e.localizedMessage).toMessage())
         }
+    }
+
+    override fun getCurrentUserId(): String? {
+        return firebaseAuth.currentUser?.uid
     }
 }
 
