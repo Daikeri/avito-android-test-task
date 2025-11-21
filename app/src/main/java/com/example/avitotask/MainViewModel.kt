@@ -2,7 +2,7 @@ package com.example.avitotask
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.auth.AuthStatusRepository
+import com.example.auth.AuthRepository // Обновлен импорт
 import com.example.util.ResultState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
@@ -18,7 +18,8 @@ sealed class MainUiState {
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    private val authRepository: AuthStatusRepository
+    // Обновлен интерфейс репозитория
+    private val authRepository: AuthRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<MainUiState>(MainUiState.Loading)
@@ -29,20 +30,20 @@ class MainViewModel @Inject constructor(
     }
 
     private fun checkAuthStatus() {
-       viewModelScope.launch {
-           val result = authRepository.getCurrentUserStatus()
+        viewModelScope.launch {
+            val result = authRepository.isUserAuth()
 
-           val destination = when (result) {
-               is ResultState.Success -> {
-                   if (result.data) MainNavGraphDest.WithBottomBar else MainNavGraphDest.Login
-               }
-               is ResultState.Error -> {
-                   MainNavGraphDest.Login
-               }
-           }
+            val destination = when (result) {
+                is ResultState.Success -> {
+                    if (result.data) MainNavGraphDest.WithBottomBar else MainNavGraphDest.Login
+                }
+                is ResultState.Error -> {
+                    MainNavGraphDest.Login
+                }
+            }
 
-           delay(1000) // для видимости круговой загрузки, мб вместо нее будет сплэш экран
-           _uiState.value = MainUiState.Success(destination)
-       }
+            delay(1000) // для видимости круговой загрузки
+            _uiState.value = MainUiState.Success(destination)
+        }
     }
 }
