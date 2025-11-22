@@ -14,7 +14,7 @@ android {
     compileSdk = 35
 
     defaultConfig {
-        minSdk = 24
+        minSdk = 26
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
@@ -59,4 +59,5 @@ dependencies {
     implementation(project(":core:firebasefirestore"))
     implementation(project(":core:yandexcloud"))
     implementation(project(":core:util"))
+    implementation(project(":domain:bookslist"))
 }
