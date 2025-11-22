@@ -1,19 +1,17 @@
 package com.example.firebasefirestore
 
-
-import com.example.books.MetaBookRepository
 import com.google.firebase.firestore.FirebaseFirestore
-import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
+
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class FirestoreModuleBind {
-    @Binds
+object FirestoreModuleProvide {
+    @Provides
     @Singleton
-    abstract fun bindMetaBookRepository(impl: FirestoreMetaBookRepository): MetaBookRepository
+    fun provideFirestore(): FirebaseFirestore = FirebaseFirestore.getInstance()
 }

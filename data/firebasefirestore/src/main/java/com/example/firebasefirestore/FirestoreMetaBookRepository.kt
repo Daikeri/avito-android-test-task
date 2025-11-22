@@ -11,7 +11,7 @@ import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 class FirestoreMetaBookRepository @Inject constructor(
-    private val firestore: FirebaseFirestore
+    private val firestoreRds: FirestoreRds
 ) : MetaBookRepository {
 
     override suspend fun uploadMeta(
@@ -28,7 +28,7 @@ class FirestoreMetaBookRepository @Inject constructor(
                 userId = userId
             )
 
-            firestore.collection("books")
+            firestoreRds.getInstance().collection("books")
                 .add(book)
                 .await()
 
