@@ -16,6 +16,7 @@
             <option value="$PROJECT_DIR$/core/util" />
             <option value="$PROJECT_DIR$/core/yandexcloud" />
             <option value="$PROJECT_DIR$/data" />
+            <option value="$PROJECT_DIR$/data/bookslist" />
             <option value="$PROJECT_DIR$/data/firebaseauth" />
             <option value="$PROJECT_DIR$/data/firebasefirestore" />
             <option value="$PROJECT_DIR$/data/firebasestorage" />
