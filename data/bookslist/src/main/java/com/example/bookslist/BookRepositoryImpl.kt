@@ -3,6 +3,9 @@ package com.example.bookslist
 import android.content.Context
 import aws.sdk.kotlin.services.s3.model.GetObjectRequest
 import aws.smithy.kotlin.runtime.content.writeToFile
+import com.example.bookslist.Book
+import com.example.bookslist.BookRepository
+import com.example.bookslist.MetaBookError
 import com.example.firebasefirestore.FirestoreRds
 import com.example.util.ResultState
 import com.example.yandexcloud.BUCKET_NAME
@@ -29,39 +32,51 @@ class BookRepositoryImpl @Inject constructor(
                 .get()
                 .await()
 
-            val books = snapshot.documents.map { doc ->
-                val id = doc.id
-                val title = doc.getString("title") ?: "Unknown"
-                val author = doc.getString("author") ?: "Unknown"
-                val storagePath = doc.getString("storagePath") ?: ""
-                val coverUrl = doc.getString("coverUrl")
+            val books = snapshot.documents.mapNotNull { doc ->
+                try {
+                    val id = doc.id
+                    val title = doc.getString("title") ?: "Без названия"
+                    val author = doc.getString("author") ?: "Неизвестный автор"
+                    val fileUrl = doc.getString("fileUrl") ?: return@mapNotNull null
+                    val dateAdded = doc.getLong("dateAdded") ?: 0L
 
-                val localFile = File(booksDir, "$id.epub")
-                val isDownloaded = localFile.exists()
+                    // Логика парсинга URL и расширения
+                    val storageKey = extractKeyFromUrl(fileUrl)
+                    val extension = extractExtension(fileUrl)
 
-                Book(
-                    id = id,
-                    title = title,
-                    author = author,
-                    coverUrl = coverUrl,
-                    storagePath = storagePath,
-                    localPath = if (isDownloaded) localFile.absolutePath else null,
-                    isDownloaded = isDownloaded
-                )
+                    // Проверяем наличие файла с правильным расширением
+                    val localFile = File(booksDir, "$id.$extension")
+                    val isDownloaded = localFile.exists()
+
+                    Book(
+                        id = id,
+                        title = title,
+                        author = author,
+                        fileUrl = fileUrl,
+                        storageKey = storageKey,
+                        extension = extension,
+                        localPath = if (isDownloaded) localFile.absolutePath else null,
+                        isDownloaded = isDownloaded,
+                        dateAdded = dateAdded
+                    )
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    null
+                }
             }
-
             ResultState.Success(books)
         } catch (e: Exception) {
-            ResultState.Error(mapExceptionToDomainError(e))
+            ResultState.Error(MetaBookError.Unknown(e.message))
         }
     }
 
     override suspend fun downloadBook(book: Book): ResultState<Book, MetaBookError> = withContext(Dispatchers.IO) {
-        val localFile = File(booksDir, "${book.id}.epub")
+        val localFile = File(booksDir, "${book.id}.${book.extension}")
+
         try {
             val request = GetObjectRequest {
                 bucket = BUCKET_NAME
-                key = book.storagePath
+                key = book.storageKey
             }
 
             yandexCloudRds.getInstance().getObject(request) { response ->
@@ -72,7 +87,7 @@ class BookRepositoryImpl @Inject constructor(
             ResultState.Success(book.copy(isDownloaded = true, localPath = localFile.absolutePath))
         } catch (e: Exception) {
             if (localFile.exists()) localFile.delete()
-            ResultState.Error(mapExceptionToDomainError(e))
+            ResultState.Error(MetaBookError.Unknown(e.message))
         }
     }
 
@@ -80,7 +95,7 @@ class BookRepositoryImpl @Inject constructor(
         try {
             val file = File(book.localPath ?: "")
             if (file.exists() && !file.delete()) {
-                return@withContext ResultState.Error(MetaBookError.Unknown("Could not delete file"))
+                return@withContext ResultState.Error(MetaBookError.Unknown("Не удалось удалить файл"))
             }
             ResultState.Success(book.copy(isDownloaded = false, localPath = null))
         } catch (e: Exception) {
@@ -88,9 +103,17 @@ class BookRepositoryImpl @Inject constructor(
         }
     }
 
-    private fun mapExceptionToDomainError(e: Throwable): MetaBookError {
-        return when (e) {
-            else -> MetaBookError.Unknown(e.message)
+    private fun extractKeyFromUrl(url: String): String {
+        val bucketPart = "$BUCKET_NAME/"
+        val index = url.indexOf(bucketPart)
+        return if (index != -1) {
+            url.substring(index + bucketPart.length)
+        } else {
+            url.substringAfterLast("/")
         }
+    }
+
+    private fun extractExtension(url: String): String {
+        return url.substringAfterLast('.', "bin").take(4)
     }
 }

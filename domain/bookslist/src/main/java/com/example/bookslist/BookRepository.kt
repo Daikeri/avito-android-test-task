@@ -11,14 +11,17 @@ sealed class MetaBookError {
     data class Unknown(val message: String?) : MetaBookError()
 }
 
+
 data class Book(
     val id: String,
     val title: String,
     val author: String,
-    val coverUrl: String?,
-    val storagePath: String, // Путь к файлу в облаке (ключ S3)
-    val localPath: String?,  // Путь к файлу на устройстве, если скачан
-    val isDownloaded: Boolean
+    val fileUrl: String,
+    val storageKey: String,
+    val extension: String,
+    val localPath: String?,
+    val isDownloaded: Boolean,
+    val dateAdded: Long
 )
 
 interface BookRepository {
