@@ -2,9 +2,12 @@ package com.example.firebasestorage
 
 import android.content.Context
 import android.net.Uri
+import android.net.http.HttpEngine
+import android.util.Log
 import aws.sdk.kotlin.runtime.auth.credentials.StaticCredentialsProvider
 import aws.sdk.kotlin.services.s3.S3Client
 import aws.sdk.kotlin.services.s3.model.PutObjectRequest
+import aws.smithy.kotlin.runtime.content.ByteStream
 import aws.smithy.kotlin.runtime.content.asByteStream
 import com.example.books.RawBookRepository
 import com.example.books.RawBookError
@@ -38,6 +41,8 @@ class YandexRawBookRepository @Inject constructor(
             accessKeyId = ACCESS_KEY_ID
             secretAccessKey = SECRET_KEY
         }
+
+        continueHeaderThresholdBytes = null
     }
 
     override suspend fun uploadFile(uri: Uri): ResultState<String, RawBookError> {
@@ -49,7 +54,6 @@ class YandexRawBookRepository @Inject constructor(
 
         try {
             contentResolver.openInputStream(uri)?.use { inputStream ->
-
                 tempFile.outputStream().use { outputStream ->
                     inputStream.copyTo(outputStream)
                 }
