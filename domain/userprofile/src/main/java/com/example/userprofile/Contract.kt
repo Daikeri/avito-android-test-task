@@ -27,10 +27,5 @@ interface FirebaseAuthRepository {
 
 interface ProfileImageRepository {
     suspend fun uploadImage(uri: Uri, fileName: String): ResultState<String, ProfileError>
-
-    /**
-     * На будущее: если захочешь где-то скачивать,
-     * можно будет использовать этот метод.
-     */
     suspend fun downloadImage(fileKey: String): ResultState<ByteArray, ProfileError>
 }
