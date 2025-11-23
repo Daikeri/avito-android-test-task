@@ -101,14 +101,14 @@ class BookReaderViewModel @Inject constructor(
                     val ext = file.extension.lowercase()
                     Log.e("FORMAT FILE", ext)
 
-//                    val text = when (ext) {
-//                        "txt" -> file.readText()
-//                        "epub" -> parseEpub(file)
-//                        "pdf" -> parsePdf(file)
-//                        else -> throw IllegalArgumentException("Формат .$ext не поддерживается")
-//                    }
+                    val text = when (ext) {
+                        "txt" -> file.readText()
+                        "epub" -> parseEpub(file)
+                        "pdf" -> parsePdf(file)
+                        else -> throw IllegalArgumentException("Формат .$ext не поддерживается")
+                    }
 
-                    Result.success(file.readText())
+                    Result.success(text)
                 } catch (e: Exception) {
                     Result.failure(e)
                 }
