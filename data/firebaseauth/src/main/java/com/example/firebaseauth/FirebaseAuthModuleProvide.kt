@@ -1,6 +1,7 @@
 package com.example.firebaseauth
 
 import com.example.auth.AuthRepository
+import com.example.auth.UserProfileRepository
 import com.google.firebase.auth.FirebaseAuth
 import dagger.Binds
 import dagger.Module
@@ -24,4 +25,10 @@ interface FirebaseAuthModuleBind {
     @Binds
     @Singleton
     fun bindAuthRepository(impl: FirebaseAuthRepository): AuthRepository
+
+    @Binds
+    fun bindUserProfileRepository(
+        impl: FirestoreUserProfileRepository
+    ): UserProfileRepository
 }
+
