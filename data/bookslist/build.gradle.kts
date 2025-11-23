@@ -60,4 +60,5 @@ dependencies {
     implementation(project(":core:yandexcloud"))
     implementation(project(":core:util"))
     implementation(project(":domain:bookslist"))
+    implementation(project(":core:firebaseauth"))
 }

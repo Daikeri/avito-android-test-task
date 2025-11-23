@@ -6,6 +6,7 @@ import aws.smithy.kotlin.runtime.content.writeToFile
 import com.example.bookslist.Book
 import com.example.bookslist.BookRepository
 import com.example.bookslist.MetaBookError
+import com.example.firebaseauth.FirebaseAuthRds
 import com.example.firebasefirestore.FirestoreRds
 import com.example.util.ResultState
 import com.example.yandexcloud.BUCKET_NAME
@@ -20,6 +21,7 @@ import javax.inject.Inject
 class BookRepositoryImpl @Inject constructor(
     private val firestoreRds: FirestoreRds,
     private val yandexCloudRds: YandexCloudRds,
+    private val firebaseAuthRds: FirebaseAuthRds,
     @ApplicationContext private val context: Context
 ) : BookRepository {
 
