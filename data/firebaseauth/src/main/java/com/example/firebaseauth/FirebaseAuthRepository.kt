@@ -12,11 +12,11 @@ import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 class FirebaseAuthRepository @Inject constructor(
-    private val firebaseAuth: FirebaseAuth
+    private val firebaseAuthRds: FirebaseAuthRds
 ): AuthRepository {
     override suspend fun register(email: String, password: String): ResultState<Unit, AuthError> {
         return try {
-            firebaseAuth.createUserWithEmailAndPassword(email, password).await()
+            firebaseAuthRds.getInstance().createUserWithEmailAndPassword(email, password).await()
             ResultState.Success(Unit)
         } catch (e: FirebaseAuthUserCollisionException) {
             ResultState.Error(AuthError.UserCollision)
@@ -31,7 +31,7 @@ class FirebaseAuthRepository @Inject constructor(
 
     override suspend fun login(email: String, password: String): ResultState<Unit, AuthError> {
         return try {
-            firebaseAuth.signInWithEmailAndPassword(email, password).await()
+            firebaseAuthRds.getInstance().signInWithEmailAndPassword(email, password).await()
             ResultState.Success(Unit)
         } catch (e: FirebaseAuthInvalidCredentialsException) {
             ResultState.Error(AuthError.InvalidCredentials)
@@ -44,7 +44,7 @@ class FirebaseAuthRepository @Inject constructor(
 
     override fun isUserAuth(): ResultState<Boolean, AuthError> {
         return try {
-            val user = firebaseAuth.currentUser
+            val user = firebaseAuthRds.getInstance().currentUser
             ResultState.Success(user != null)
         } catch (e: Exception) {
             ResultState.Error(AuthError.Unknown(e.localizedMessage))
@@ -52,7 +52,7 @@ class FirebaseAuthRepository @Inject constructor(
     }
 
     override fun getCurrentUserId(): String? {
-        return firebaseAuth.currentUser?.uid
+        return firebaseAuthRds.getInstance().currentUser?.uid
     }
 }
 

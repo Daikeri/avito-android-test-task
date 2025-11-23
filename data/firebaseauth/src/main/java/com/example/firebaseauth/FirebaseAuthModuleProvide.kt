@@ -11,13 +11,6 @@ import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
 
-@Module
-@InstallIn(SingletonComponent::class)
-object FirebaseAuthModuleProvide {
-    @Provides
-    @Singleton
-    fun provideFirebaseAuth(): FirebaseAuth = FirebaseAuth.getInstance()
-}
 
 @Module
 @InstallIn(SingletonComponent::class)

@@ -12,6 +12,7 @@
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/core" />
+            <option value="$PROJECT_DIR$/core/firebaseauth" />
             <option value="$PROJECT_DIR$/core/firebasefirestore" />
             <option value="$PROJECT_DIR$/core/util" />
             <option value="$PROJECT_DIR$/core/yandexcloud" />
@@ -20,14 +21,17 @@
             <option value="$PROJECT_DIR$/data/firebaseauth" />
             <option value="$PROJECT_DIR$/data/firebasefirestore" />
             <option value="$PROJECT_DIR$/data/firebasestorage" />
+            <option value="$PROJECT_DIR$/data/userprofile" />
             <option value="$PROJECT_DIR$/domain" />
             <option value="$PROJECT_DIR$/domain/auth" />
             <option value="$PROJECT_DIR$/domain/books" />
             <option value="$PROJECT_DIR$/domain/bookslist" />
+            <option value="$PROJECT_DIR$/domain/userprofile" />
             <option value="$PROJECT_DIR$/feature" />
             <option value="$PROJECT_DIR$/feature/auth" />
             <option value="$PROJECT_DIR$/feature/listofbooks" />
             <option value="$PROJECT_DIR$/feature/uploadbooks" />
+            <option value="$PROJECT_DIR$/feature/userprofile" />
           </set>
         </option>
         <option name="resolveExternalAnnotations" value="false" />

@@ -79,6 +79,7 @@
         implementation(project(":data:firebaseauth"))
         implementation(project(":feature:uploadbooks"))
         implementation(project(":feature:listofbooks"))
+        implementation(project(":feature:userprofile"))
 
 
         implementation("androidx.navigation:navigation-compose:2.9.6")

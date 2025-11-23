@@ -6,6 +6,7 @@ import aws.smithy.kotlin.runtime.content.writeToFile
 import com.example.bookslist.Book
 import com.example.bookslist.BookRepository
 import com.example.bookslist.MetaBookError
+import com.example.firebaseauth.FirebaseAuthRds
 import com.example.firebasefirestore.FirestoreRds
 import com.example.util.ResultState
 import com.example.yandexcloud.BUCKET_NAME
@@ -20,6 +21,7 @@ import javax.inject.Inject
 class BookRepositoryImpl @Inject constructor(
     private val firestoreRds: FirestoreRds,
     private val yandexCloudRds: YandexCloudRds,
+    private val firebaseAuthRds: FirebaseAuthRds,
     @ApplicationContext private val context: Context
 ) : BookRepository {
 
@@ -27,8 +29,15 @@ class BookRepositoryImpl @Inject constructor(
 
     override suspend fun getBooks(): ResultState<List<Book>, MetaBookError> = withContext(Dispatchers.IO) {
         try {
+            val currentUserId = firebaseAuthRds
+                .getInstance()
+                .currentUser
+                ?.uid
+                ?: return@withContext ResultState.Error(MetaBookError.PermissionDenied)
+
             val snapshot = firestoreRds.getInstance()
                 .collection("books")
+                .whereEqualTo("userId", currentUserId)
                 .get()
                 .await()
 
@@ -39,12 +48,10 @@ class BookRepositoryImpl @Inject constructor(
                     val author = doc.getString("author") ?: "Неизвестный автор"
                     val fileUrl = doc.getString("fileUrl") ?: return@mapNotNull null
                     val dateAdded = doc.getLong("dateAdded") ?: 0L
+                    val extension = doc.getString("extension") ?: extractExtension(fileUrl)
 
-                    // Логика парсинга URL и расширения
                     val storageKey = extractKeyFromUrl(fileUrl)
-                    val extension = extractExtension(fileUrl)
 
-                    // Проверяем наличие файла с правильным расширением
                     val localFile = File(booksDir, "$id.$extension")
                     val isDownloaded = localFile.exists()
 
@@ -64,7 +71,9 @@ class BookRepositoryImpl @Inject constructor(
                     null
                 }
             }
+
             ResultState.Success(books)
+
         } catch (e: Exception) {
             ResultState.Error(MetaBookError.Unknown(e.message))
         }
@@ -85,6 +94,7 @@ class BookRepositoryImpl @Inject constructor(
             }
 
             ResultState.Success(book.copy(isDownloaded = true, localPath = localFile.absolutePath))
+
         } catch (e: Exception) {
             if (localFile.exists()) localFile.delete()
             ResultState.Error(MetaBookError.Unknown(e.message))
@@ -104,15 +114,11 @@ class BookRepositoryImpl @Inject constructor(
     }
 
     private fun extractKeyFromUrl(url: String): String {
-        return url
-            .substringBefore("?")
-            .substringAfter("$BUCKET_NAME/")
+        return url.substringBefore("?").substringAfter("$BUCKET_NAME/")
     }
-
 
     private fun extractExtension(url: String): String {
         val key = extractKeyFromUrl(url)
         return key.substringAfterLast('.', "bin")
     }
-
 }
