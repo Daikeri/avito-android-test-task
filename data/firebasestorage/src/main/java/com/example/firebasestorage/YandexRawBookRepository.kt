@@ -2,19 +2,13 @@ package com.example.firebasestorage
 
 import android.content.Context
 import android.net.Uri
-import android.net.http.HttpEngine
-import android.util.Log
-import aws.sdk.kotlin.runtime.auth.credentials.StaticCredentialsProvider
-import aws.sdk.kotlin.services.s3.S3Client
 import aws.sdk.kotlin.services.s3.model.PutObjectRequest
-import aws.smithy.kotlin.runtime.content.ByteStream
 import aws.smithy.kotlin.runtime.content.asByteStream
 import com.example.books.RawBookRepository
 import com.example.books.RawBookError
 import com.example.util.ResultState
 import java.util.UUID
 import javax.inject.Inject
-import aws.smithy.kotlin.runtime.net.url.Url
 import com.example.yandexcloud.BUCKET_NAME
 import com.example.yandexcloud.YC_ENDPOINT
 import com.example.yandexcloud.YandexCloudRds
