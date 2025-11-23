@@ -54,7 +54,10 @@ dependencies {
     // firebase auth
     implementation(platform("com.google.firebase:firebase-bom:33.5.1"))
     implementation("com.google.firebase:firebase-auth-ktx")
+    implementation("com.google.firebase:firebase-firestore")
+
 
     implementation(project(":core:util"))
     implementation(project(":domain:auth"))
+    implementation(project(":core:firebasefirestore"))
 }
