@@ -143,7 +143,7 @@ fun UploadBookScreen(
                     imeAction = ImeAction.Done
                 ),
                 keyboardActions = KeyboardActions(
-                    onDone = { focusManager.moveFocus(FocusDirection.Down) }
+                    onDone = { focusManager.clearFocus() }
                 )
             )
 
