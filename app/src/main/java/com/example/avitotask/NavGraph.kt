@@ -23,6 +23,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.example.auth.LoginScreen
+import com.example.auth.RegisterScreen
 import com.example.avitotask.ui.AvitoTaskTheme
 import com.example.listofbooks.MyBooksScreen
 import com.example.listofbooks.BookReaderScreen
@@ -39,6 +40,9 @@ sealed class MainNavGraphDest {
 
     @Serializable
     data class ReadBook(val localPath: String) : MainNavGraphDest()
+
+    @Serializable
+    data object Register : MainNavGraphDest()
 }
 
 
@@ -86,7 +90,8 @@ fun MainNavHost(
                                     popUpTo(MainNavGraphDest.Login) { inclusive = true }
                                 }
                             },
-                            onNavigateToRegister = {}
+                            onNavigateToRegister = { navController.navigate(MainNavGraphDest.Register) }
+
                         )
                     }
 
@@ -105,6 +110,18 @@ fun MainNavHost(
                             onBack = { navController.popBackStack() }
                         )
                     }
+
+                    composable<MainNavGraphDest.Register> {
+                        RegisterScreen(
+                            onSuccess = {
+                                navController.navigate(MainNavGraphDest.Tabs) {
+                                    popUpTo(MainNavGraphDest.Register) { inclusive = true }
+                                }
+                            },
+                            onBack = { navController.popBackStack() }
+                        )
+                    }
+
                 }
             }
         }
