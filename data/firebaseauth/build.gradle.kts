@@ -60,4 +60,5 @@ dependencies {
     implementation(project(":core:util"))
     implementation(project(":domain:auth"))
     implementation(project(":core:firebasefirestore"))
+    implementation(project(":core:firebaseauth"))
 }
