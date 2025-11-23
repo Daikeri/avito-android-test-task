@@ -34,6 +34,7 @@ import com.example.avitotask.ui.AvitoTaskTheme
 import com.example.listofbooks.MyBooksScreen
 import com.example.listofbooks.BookReaderScreen
 import com.example.uploadbooks.UploadBookScreen
+import com.example.userprofile.ProfileScreen
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -51,7 +52,6 @@ sealed class MainNavGraphDest {
     data object Register : MainNavGraphDest()
 }
 
-
 @Serializable
 sealed class TabsNavGraphDest {
     @Serializable
@@ -63,7 +63,6 @@ sealed class TabsNavGraphDest {
     @Serializable
     data object Profile : TabsNavGraphDest()
 }
-
 
 @Composable
 fun MainNavHost(
@@ -96,8 +95,9 @@ fun MainNavHost(
                                     popUpTo(MainNavGraphDest.Login) { inclusive = true }
                                 }
                             },
-                            onNavigateToRegister = { navController.navigate(MainNavGraphDest.Register) }
-
+                            onNavigateToRegister = {
+                                navController.navigate(MainNavGraphDest.Register)
+                            }
                         )
                     }
 
@@ -105,6 +105,11 @@ fun MainNavHost(
                         TabsScreen(
                             onNavigateToReader = { path ->
                                 navController.navigate(MainNavGraphDest.ReadBook(path))
+                            },
+                            onLogout = {
+                                navController.navigate(MainNavGraphDest.Login) {
+                                    popUpTo(MainNavGraphDest.Tabs) { inclusive = true }
+                                }
                             }
                         )
                     }
@@ -127,17 +132,16 @@ fun MainNavHost(
                             onBack = { navController.popBackStack() }
                         )
                     }
-
                 }
             }
         }
     }
 }
 
-
 @Composable
 fun TabsScreen(
-    onNavigateToReader: (String) -> Unit
+    onNavigateToReader: (String) -> Unit,
+    onLogout: () -> Unit
 ) {
     val navController = rememberNavController()
 
@@ -210,6 +214,9 @@ fun TabsScreen(
             }
 
             composable<TabsNavGraphDest.Profile> {
+                ProfileScreen(
+                    onLogout = onLogout
+                )
             }
         }
     }
