@@ -18,12 +18,6 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
-
-        val accessKey: String = providers.gradleProperty("YC_ACCESS_KEY_ID").get()
-        val secretKey: String = providers.gradleProperty("YC_SECRET_KEY").get()
-
-        buildConfigField("String", "YC_ACCESS_KEY_ID", "\"$accessKey\"")
-        buildConfigField("String", "YC_SECRET_KEY", "\"$secretKey\"")
     }
 
     buildTypes {
@@ -67,6 +61,7 @@ dependencies {
 
     implementation(project(":core:util"))
     implementation(project(":domain:books"))
+    implementation(project(":core:yandexcloud"))
 
     implementation("aws.sdk.kotlin:s3:1.3.6")
 

@@ -35,7 +35,7 @@ class MainViewModel @Inject constructor(
 
             val destination = when (result) {
                 is ResultState.Success -> {
-                    if (result.data) MainNavGraphDest.WithBottomBar else MainNavGraphDest.Login
+                    if (result.data) MainNavGraphDest.Tabs else MainNavGraphDest.Login
                 }
                 is ResultState.Error -> {
                     MainNavGraphDest.Login

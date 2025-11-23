@@ -78,6 +78,10 @@
         implementation(project(":domain:auth"))
         implementation(project(":data:firebaseauth"))
         implementation(project(":feature:uploadbooks"))
+        implementation(project(":feature:listofbooks"))
+
 
         implementation("androidx.navigation:navigation-compose:2.9.6")
+
+        implementation("androidx.compose.material:material-icons-extended")
     }

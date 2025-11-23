@@ -5,12 +5,10 @@ plugins {
     id("com.google.devtools.ksp")
     // hilt + dagger
     id("com.google.dagger.hilt.android")
-    //firebase
-    id("com.google.gms.google-services")
 }
 
 android {
-    namespace = "com.example.firebasefirestore"
+    namespace = "com.example.bookslist"
     compileSdk = 35
 
     defaultConfig {
@@ -52,8 +50,5 @@ dependencies {
     ksp("com.google.dagger:hilt-android-compiler:2.56.2")
     implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
 
-    // firebase firestore
-    implementation(platform("com.google.firebase:firebase-bom:33.5.1"))
-    implementation("com.google.firebase:firebase-firestore")
-
+    implementation(project(":core:util"))
 }

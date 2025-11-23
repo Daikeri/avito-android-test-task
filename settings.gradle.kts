@@ -16,6 +16,7 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        maven("https://github.com/psiegman/mvn-repo/raw/master/releases")
     }
 }
 
@@ -34,3 +35,7 @@ include(":domain:books")
 include(":feature:uploadbooks")
 include(":domain:auth")
 include(":core:firebasefirestore")
+include(":core:yandexcloud")
+include(":data:bookslist")
+include(":feature:listofbooks")
+include(":domain:bookslist")

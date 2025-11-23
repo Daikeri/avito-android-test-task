@@ -10,7 +10,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.firebasefirestore"
+    namespace = "com.example.bookslist"
     compileSdk = 35
 
     defaultConfig {
@@ -52,8 +52,12 @@ dependencies {
     ksp("com.google.dagger:hilt-android-compiler:2.56.2")
     implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
 
-    // firebase firestore
     implementation(platform("com.google.firebase:firebase-bom:33.5.1"))
     implementation("com.google.firebase:firebase-firestore")
+    implementation("aws.sdk.kotlin:s3:1.3.6")
 
+    implementation(project(":core:firebasefirestore"))
+    implementation(project(":core:yandexcloud"))
+    implementation(project(":core:util"))
+    implementation(project(":domain:bookslist"))
 }

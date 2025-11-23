@@ -5,12 +5,10 @@ plugins {
     id("com.google.devtools.ksp")
     // hilt + dagger
     id("com.google.dagger.hilt.android")
-    //firebase
-    id("com.google.gms.google-services")
 }
 
 android {
-    namespace = "com.example.firebasefirestore"
+    namespace = "com.example.yandexcloud"
     compileSdk = 35
 
     defaultConfig {
@@ -18,6 +16,12 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
+
+        val accessKey: String = providers.gradleProperty("YC_ACCESS_KEY_ID").get()
+        val secretKey: String = providers.gradleProperty("YC_SECRET_KEY").get()
+
+        buildConfigField("String", "YC_ACCESS_KEY_ID", "\"$accessKey\"")
+        buildConfigField("String", "YC_SECRET_KEY", "\"$secretKey\"")
     }
 
     buildTypes {
@@ -36,6 +40,9 @@ android {
     kotlinOptions {
         jvmTarget = "11"
     }
+    buildFeatures {
+        buildConfig = true
+    }
 }
 
 dependencies {
@@ -52,8 +59,5 @@ dependencies {
     ksp("com.google.dagger:hilt-android-compiler:2.56.2")
     implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
 
-    // firebase firestore
-    implementation(platform("com.google.firebase:firebase-bom:33.5.1"))
-    implementation("com.google.firebase:firebase-firestore")
-
+    implementation("aws.sdk.kotlin:s3:1.3.6")
 }
