@@ -16,6 +16,7 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        maven("https://github.com/psiegman/mvn-repo/raw/master/releases")
     }
 }
 
