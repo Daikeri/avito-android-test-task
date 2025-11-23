@@ -65,7 +65,7 @@ fun LoginScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
                 .padding(16.dp)
-                .imePadding()  // ⬅ Клавиатура НЕ перекрывает
+                .imePadding()
         ) {
             Spacer(Modifier.weight(1f))
 
@@ -74,7 +74,7 @@ fun LoginScreen(
                 onEmailChange = viewModel::onEmailChange,
                 onPasswordChange = viewModel::onPasswordChange,
                 onLoginClick = {
-                    focusManager.clearFocus()  // скрыть клаву
+                    focusManager.clearFocus()
                     viewModel.login()
                 }
             )
@@ -131,7 +131,7 @@ private fun LoginFormContent(
             ),
             keyboardActions = KeyboardActions(
                 onDone = {
-                    focusManager.clearFocus() // скрывает клавиатуру
+                    focusManager.clearFocus()
                     onLoginClick()
                 }
             )
