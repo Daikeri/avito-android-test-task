@@ -29,7 +29,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UploadBookScreen(
-    onNavigateBack: () -> Unit,
     viewModel: UploadBookViewModel = hiltViewModel()
 ) {
     val state by viewModel.uiState.collectAsState()

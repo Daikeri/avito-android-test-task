@@ -206,9 +206,7 @@ fun TabsScreen(
             }
 
             composable<TabsNavGraphDest.UploadBooks> {
-                UploadBookScreen(
-                    onNavigateBack = {}
-                )
+                UploadBookScreen()
             }
 
             composable<TabsNavGraphDest.Profile> {
