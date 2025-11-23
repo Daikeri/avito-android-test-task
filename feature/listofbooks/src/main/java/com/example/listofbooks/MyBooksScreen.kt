@@ -21,12 +21,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import coil.compose.AsyncImage
 import com.example.bookslist.Book
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -62,7 +60,6 @@ fun MyBooksScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            // Поиск
             OutlinedTextField(
                 value = searchQuery,
                 onValueChange = viewModel::onSearchQueryChanged,
@@ -137,7 +134,6 @@ fun BookItem(
         modifier = Modifier
             .fillMaxWidth()
             .clickable {
-                // Открываем только если скачано
                 if (book.isDownloaded && book.localPath != null) {
                     onClick(book.localPath!!)
                 }
@@ -145,8 +141,6 @@ fun BookItem(
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // --- ПЛЕЙСХОЛДЕР ОБЛОЖКИ ---
-        // Так как обложки нет в Firestore, рисуем заглушку с типом файла
         Box(
             modifier = Modifier
                 .size(60.dp, 80.dp)
@@ -157,7 +151,7 @@ fun BookItem(
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Icon(
                     imageVector = when(book.extension.lowercase()) {
-                        "pdf" -> Icons.Default.PictureAsPdf // Нужна зависимость material-icons-extended или своя иконка
+                        "pdf" -> Icons.Default.PictureAsPdf
                         "txt" -> Icons.Default.Description
                         "epub" -> Icons.Default.Book
                         else -> Icons.Default.InsertDriveFile
@@ -189,11 +183,8 @@ fun BookItem(
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
-            // Можно добавить дату добавления, если нужно
-            // Text(text = formatDate(book.dateAdded), style = ...)
         }
 
-        // --- КНОПКА ДЕЙСТВИЯ ---
         IconButton(onClick = { onAction(book) }) {
             if (book.isDownloaded) {
                 Icon(

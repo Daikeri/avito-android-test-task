@@ -62,7 +62,6 @@ class MyBooksViewModel @Inject constructor(
                     }
                 }
                 is ResultState.Error -> {
-                    // result.error имеет тип MetaBookError
                     val errorMessage = mapErrorToString(result.error)
                     _uiState.value = MyBooksUiState.Error(errorMessage)
                 }
@@ -88,6 +87,7 @@ class MyBooksViewModel @Inject constructor(
                 _events.emit(MyBooksEvent.ShowToast("Книга загружена"))
             }
             is ResultState.Error -> {
+                Log.e("ERROR FROM VM", "${result.error}")
                 _events.emit(MyBooksEvent.ShowToast("Ошибка: ${mapErrorToString(result.error)}"))
             }
         }
@@ -105,7 +105,6 @@ class MyBooksViewModel @Inject constructor(
         }
     }
 
-    // Вспомогательный метод для конвертации доменной ошибки в текст для UI
     private fun mapErrorToString(error: MetaBookError): String {
         return when (error) {
             is MetaBookError.NetworkError -> "Проверьте соединение с интернетом"
@@ -116,7 +115,6 @@ class MyBooksViewModel @Inject constructor(
         }
     }
 
-    // ... методы onSearchQueryChanged и updateBookInList остаются прежними
     fun onSearchQueryChanged(query: String) {
         _searchQuery.value = query
         val currentState = _uiState.value
