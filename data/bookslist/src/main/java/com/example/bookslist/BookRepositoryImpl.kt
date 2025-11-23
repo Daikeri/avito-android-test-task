@@ -104,16 +104,15 @@ class BookRepositoryImpl @Inject constructor(
     }
 
     private fun extractKeyFromUrl(url: String): String {
-        val bucketPart = "$BUCKET_NAME/"
-        val index = url.indexOf(bucketPart)
-        return if (index != -1) {
-            url.substring(index + bucketPart.length)
-        } else {
-            url.substringAfterLast("/")
-        }
+        return url
+            .substringBefore("?")
+            .substringAfter("$BUCKET_NAME/")
     }
 
+
     private fun extractExtension(url: String): String {
-        return url.substringAfterLast('.', "bin").take(4)
+        val key = extractKeyFromUrl(url)
+        return key.substringAfterLast('.', "bin")
     }
+
 }
