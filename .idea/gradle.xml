@@ -31,6 +31,7 @@
             <option value="$PROJECT_DIR$/feature/auth" />
             <option value="$PROJECT_DIR$/feature/listofbooks" />
             <option value="$PROJECT_DIR$/feature/uploadbooks" />
+            <option value="$PROJECT_DIR$/feature/userprofile" />
           </set>
         </option>
         <option name="resolveExternalAnnotations" value="false" />
