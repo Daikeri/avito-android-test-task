@@ -71,4 +71,12 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation("androidx.compose.material:material-icons-extended")
     implementation("io.coil-kt:coil:2.6.0") // Используйте актуальную версию
-    implementation("io.coil-kt:coil-compose:2.6.0")}
+    implementation("io.coil-kt:coil-compose:2.6.0")
+
+    implementation("com.tom-roush:pdfbox-android:2.0.27.0")
+    implementation("nl.siegmann.epublib:epublib-core:3.1") {
+        exclude(group = "xmlpull")
+        exclude(group = "net.sf.kxml")
+    }
+    implementation("org.jsoup:jsoup:1.17.2")
+}
