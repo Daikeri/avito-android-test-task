@@ -1,6 +1,7 @@
 package com.example.uploadbooks
 
 import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.auth.AuthRepository
@@ -35,7 +36,8 @@ class UploadBookViewModel @Inject constructor(
 
     private var uploadJob: Job? = null
 
-    fun uploadBook(title: String, author: String, fileUri: Uri?) {
+    fun uploadBook(title: String, author: String, fileUri: Uri?, fileName: String)
+    {
         if (title.isBlank() || author.isBlank() || fileUri == null) {
             _uiState.update { it.copy(error = UploadDomainError.Unknown("Заполните все поля")) }
             return
@@ -53,12 +55,15 @@ class UploadBookViewModel @Inject constructor(
 
             val progressJob = launch { simulateProgress() }
 
+            Log.e("FROM VM", fileName)
             val result = uploadBookUseCase(
                 userId = userId,
                 title = title,
                 author = author,
-                fileUri = fileUri
+                fileUri = fileUri,
+                fileName = fileName
             )
+
 
             progressJob.cancel()
 

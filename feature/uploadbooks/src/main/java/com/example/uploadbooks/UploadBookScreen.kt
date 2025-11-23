@@ -1,6 +1,8 @@
 package com.example.uploadbooks
 
+import android.content.Context
 import android.net.Uri
+import android.provider.OpenableColumns
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -34,7 +36,7 @@ fun UploadBookScreen(
         onResult = { uri ->
             uri?.let {
                 selectedFileUri = it
-                selectedFileName = it.path?.substringAfterLast("/") ?: "Файл выбран"
+                selectedFileName = getRealFileName(context, it)
             }
         }
     )
@@ -57,7 +59,7 @@ fun UploadBookScreen(
             Log.e("UPLOAD_ERROR", errorMessage)
             Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
 
-            viewModel.clearError() // Очищаем ошибку после показа
+            viewModel.clearError()
         }
     }
 
@@ -104,7 +106,14 @@ fun UploadBookScreen(
                 )
             } else {
                 Button(
-                    onClick = { viewModel.uploadBook(title, author, selectedFileUri) },
+                    onClick = {
+                        viewModel.uploadBook(
+                            title = title,
+                            author = author,
+                            fileUri = selectedFileUri,
+                            fileName = selectedFileName ?: ""
+                        )
+                    },
                     modifier = Modifier.fillMaxWidth(),
                     enabled = title.isNotBlank() && author.isNotBlank() && selectedFileUri != null
                 ) {
@@ -113,4 +122,21 @@ fun UploadBookScreen(
             }
         }
     }
+}
+
+private fun getRealFileName(context: Context, uri: Uri): String {
+    val cursor = context.contentResolver.query(
+        uri,
+        arrayOf(OpenableColumns.DISPLAY_NAME),
+        null, null, null
+    )
+    cursor?.use {
+        if (it.moveToFirst()) {
+            val index = it.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+            if (index != -1) {
+                return it.getString(index)
+            }
+        }
+    }
+    return "Файл"
 }

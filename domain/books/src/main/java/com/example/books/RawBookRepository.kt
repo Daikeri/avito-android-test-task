@@ -5,7 +5,7 @@ import com.example.util.ResultState
 
 interface RawBookRepository {
 
-    suspend fun uploadFile(uri: Uri): ResultState<String, RawBookError>
+    suspend fun uploadFile(uri: Uri, fileName: String): ResultState<String, RawBookError>
 }
 
 sealed class RawBookError {

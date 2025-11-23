@@ -28,9 +28,9 @@ class YandexRawBookRepository @Inject constructor(
     @ApplicationContext private val appContext: Context
 ) : RawBookRepository {
 
-    override suspend fun uploadFile(uri: Uri): ResultState<String, RawBookError> {
+    override suspend fun uploadFile(uri: Uri, fileName: String): ResultState<String, RawBookError> {
 
-        val objectKey = "uploads/${UUID.randomUUID()}_${getFileName(uri)}"
+        val objectKey = "uploads/${UUID.randomUUID()}_${fileName}"
         val contentResolver = appContext.contentResolver
 
         val tempFile = File(appContext.cacheDir, UUID.randomUUID().toString())

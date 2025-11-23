@@ -21,10 +21,11 @@ class UploadBookUseCase @Inject constructor(
         userId: String,
         title: String,
         author: String,
-        fileUri: Uri
+        fileUri: Uri,
+        fileName: String
     ): ResultState<String, UploadDomainError> {
 
-        val uploadResult = rawBookRepository.uploadFile(fileUri)
+        val uploadResult = rawBookRepository.uploadFile(fileUri, fileName)
 
         val downloadUrl = when (uploadResult) {
             is ResultState.Success -> uploadResult.data
@@ -40,7 +41,7 @@ class UploadBookUseCase @Inject constructor(
             userId = userId,
             title = title,
             author = author,
-            fileUrl = downloadUrl
+            fileUrl = downloadUrl,
         )
 
         return when (metaResult) {
