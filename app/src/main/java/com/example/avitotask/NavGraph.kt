@@ -1,7 +1,11 @@
 package com.example.avitotask
 
+
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material.icons.filled.Person
@@ -10,6 +14,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -17,6 +22,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -141,59 +147,74 @@ fun TabsScreen(
         TabsNavGraphDest.Profile,
     )
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Scaffold(
+        contentWindowInsets = WindowInsets(0),
+
+        bottomBar = {
+            NavigationBar {
+                val current = navController.currentBackStackEntryFlow
+                    .collectAsState(null).value
+                val currentRoute = current?.destination?.route
+
+                tabs.forEach { dest ->
+                    NavigationBarItem(
+                        selected = currentRoute == dest::class.qualifiedName,
+                        onClick = { navController.navigate(dest) },
+
+                        label = {
+                            Text(
+                                when (dest) {
+                                    TabsNavGraphDest.ListOfBooks -> "Мои книги"
+                                    TabsNavGraphDest.UploadBooks -> "Загрузка"
+                                    TabsNavGraphDest.Profile -> "Профиль"
+                                }
+                            )
+                        },
+
+                        icon = {
+                            val icon = when (dest) {
+                                TabsNavGraphDest.ListOfBooks -> Icons.Default.MenuBook
+                                TabsNavGraphDest.UploadBooks -> Icons.Default.Upload
+                                TabsNavGraphDest.Profile -> Icons.Default.Person
+                            }
+
+                            Icon(
+                                imageVector = icon,
+                                contentDescription = null
+                            )
+                        }
+                    )
+                }
+            }
+        }
+    ) { innerPadding ->
+
+        val onlyBottomPadding = PaddingValues(
+            bottom = innerPadding.calculateBottomPadding()
+        )
 
         NavHost(
             navController = navController,
             startDestination = TabsNavGraphDest.ListOfBooks,
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.padding(onlyBottomPadding)
         ) {
 
             composable<TabsNavGraphDest.ListOfBooks> {
                 MyBooksScreen(
-                    onBookClick = { path -> onNavigateToReader(path) }
+                    onBookClick = onNavigateToReader
                 )
             }
 
             composable<TabsNavGraphDest.UploadBooks> {
-                UploadBookScreen({})
+                UploadBookScreen(
+                    onNavigateBack = {}
+                )
             }
 
             composable<TabsNavGraphDest.Profile> {
             }
         }
-
-        NavigationBar(
-            modifier = Modifier.align(Alignment.BottomCenter)
-        ) {
-            val current = navController.currentBackStackEntryFlow
-                .collectAsState(null).value
-            val currentRoute = current?.destination?.route
-
-            tabs.forEach { dest ->
-                NavigationBarItem(
-                    selected = currentRoute == dest::class.qualifiedName,
-                    onClick = { navController.navigate(dest) },
-                    label = {
-                        Text(
-                            when (dest) {
-                                TabsNavGraphDest.ListOfBooks -> "Мои книги"
-                                TabsNavGraphDest.UploadBooks -> "Загрузка"
-                                TabsNavGraphDest.Profile -> "Профиль"
-                            }
-                        )
-                    },
-                    icon = {
-                        val icon = when (dest) {
-                            TabsNavGraphDest.ListOfBooks -> Icons.Default.MenuBook
-                            TabsNavGraphDest.UploadBooks -> Icons.Default.Upload
-                            TabsNavGraphDest.Profile -> Icons.Default.Person
-                        }
-                        Icon(imageVector = icon, contentDescription = null)
-                    }
-                )
-            }
-        }
     }
 }
+
 
